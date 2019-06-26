@@ -81,10 +81,9 @@ class MysqlConn
     public function getAllRow($sql)
     {
         $row = $this->conn->query($sql);
-        if($row)
+        if($row && $row->num_rows >= 1)
         {
-            if($row->num_rows >= 1) return $row->fetch_all();
-            return false;
+            return $row->fetch_all();
         } else {
             return false;
         }

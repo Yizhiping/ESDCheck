@@ -33,6 +33,7 @@ $.cookie('floor','');
 	}); 
  	$(window).resize(); 
 
+ 	//廠區和樓層變更
  	$('.usr_select>li').click(function(){
  		var thisValue = $(this).text();
  		var thisParent = $(this).parent().parent().attr('id');
@@ -62,7 +63,7 @@ $.cookie('floor','');
 					lastRequetTime = now.getTime();
 					$('#content').html(a);
 					$('#showTime').text('資料時間: ' + __getDateTime(lastRequetTime/1000));
-					window.console.log('[' + __getDateTime(lastRequetTime/1000) + '] -> factory:' + factory + ', floor:' + floor + ', Get all dev status data!');
+//					window.console.log('[' + __getDateTime(lastRequetTime/1000) + '] -> factory:' + factory + ', floor:' + floor + ', Get all dev status data!');
 				}
 			});
 		}
@@ -77,171 +78,113 @@ $(function() { (function getDataFromServer() {			//自動運行, 從服務器獲
 			var floor = $.cookie('floor');
 			url = url + "?sid=" + Math.random() + "&factory=" + factory + '&floor=' + floor;
 			
-			// var devIDArr = $('sapn');
-			// var devIDArr = [];
-			
-			// devIDArr.each(function() {
-				// devIDArr.push($(this).attr('id'));
-            // });
-			
-			
 			$.ajax({
 				type: 'POST',
 				url: url,
 				dataType: "json",
 				cache: false,
 				timeout: 6000,
-				data:{'lastRequetTime':lastRequetTime},
 				success: function(data, textStatus) {
-					lastRequetTime = data.ti.rst;
+					var lastUpdateTime = data.updateTime;		//數據最後更新的時間
+					$('#showTime').text('資料時間: ' + __getDateTime(lastUpdateTime) );	//更新數據更新的時間
 
-					//var now = new Date(data.ti.rst);
-					//var datatime = now.toDateString() + ' ' + now.toLocaleTimeString();
-					$('#showTime').text('資料時間: ' + __getDateTime(data.ti.rst) );
+					$('.resTR').each(function (e) {		//處理所有線體的資料
+						var lineName = $(this).attr('line');	//獲取當前線體名稱
+						var lineInfo = getLineInfo(lineName, data.dat);		//獲取當前線體資料
+						var lineState;										//新的線體資料
+						var lineUpdateTime;
+						var lineCurrentState;								//線體總狀態
+						var lineOldState =  $(this).attr('state');			//舊的線體資料
 
-					if(data.st == 1){
-						var i=0;
-						for(var id in data.da.offLines){	//未開的線體變灰色
-							$("[line='" + data.da.offLines[i] +"']").css('backgroundColor','#999');
-							// $(".div_LineName,[line='" + data.da.offLines[i] +"']").attr('sta',0);
-							$('.div_LineName').each(function(){
-								if($(this).attr('line') == data.da.offLines[i] ){
-									if($(this).attr('sta')==1){
-										window.console.log('[' + __getDateTime(lastRequetTime) + '] -> ' + data.da.offLines[i] + ' -> line off');	
+						if(lineInfo != false)
+						{
+							lineUpdateTime= lineInfo.updateTime;	//數據中當前線體的更新時間
+
+                            lineState = (Number(lastUpdateTime) - Number(lineUpdateTime)) > 300 ? 0 : lineInfo.st;				//數據中當前線體的狀態
+							$(this).attr('updatetime',lineUpdateTime);	//更新時間
+							$(this).attr('state', lineState);			//更新狀態
+
+							if(lineState == 1)							//開線狀態
+							{
+								lineCurrentState = 1;
+                                $(this).attr('state',1);											//更新線體狀態
+                                $(this).children('td').children('.devInfo').each(function (e) {
+									var devAddr = $(this).attr('addr');			//當前報警器的地址
+									var devState = $(this).attr('state');			//當前報警器的狀態
+									var devInfo = getDevInfo(devAddr,lineInfo.dat); //使用地址從數據中獲取到新的狀態信息
+
+									if(devInfo != false) {
+                                        var newUpdateTime = devInfo.updateTime;			//新的時間
+                                        var newState = (Number(lastUpdateTime) - Number(newUpdateTime)) > 300 ? 0 : devInfo.st;						//新的狀態
+										if(newState != 1) lineCurrentState = 2;			//新狀態中有非PASS的就判線體狀態為FAIL
+                                        $(this).attr('updatetime',newUpdateTime);		//更新時間
+                                        $(this).attr('state',newState);					//更新狀態
+                                        if (devState != newState || lineOldState != lineState) {			//新舊狀態不相同, 改變顏色.
+                                            if (newState == 1) {											//或者是線體狀態改變的時候
+												$(this).css('backgroundColor','#0C0');
+                                            } else if(newState == 2)
+											{
+                                                $(this).css('backgroundColor','#C66');
+											} else {
+                                                $(this).css('backgroundColor','#999');
+											}
+                                            shake($(this),'red',3);
+                                        }
+                                    } else {
+                                        $(this).remove();								//找不到時, 說明服務器上沒有這個, 刪除之
 									}
-									$(this).attr('sta',0)
-									
+                                });
+                                if(lineCurrentState != 1)								//線體不為1, 標示為紅色.
+								{
+                                    $(this).children('.lineTitle').css('backgroundColor','#C66');
+								} else {												//線體為, 標示為綠色.
+                                    $(this).children('.lineTitle').css('backgroundColor','#0C0');
 								}
-							});
-							i++;
-						}
-
-						i=0;
-						for(var id in data.da.onLines){
-							var j=0;
-							var devID  = null;
-							var devSta = null;
-							var offDevCount = 0;
-							var lineSta=1;
-							for(var k in data.da.devIDs[i]){
-								devID = data.da.devIDs[i][j];
-								devSta= data.da.devSta[i][j];
-								devLut= data.da.lut[i][j];
-
-								$('.div_LineName').each(function(){				//線體開線/關線時,線體名稱閃爍
-									if($(this).attr('line') == data.da.onLines[i] ){
-										if($(this).attr('sta')==0){
-											window.console.log('[' + __getDateTime(lastRequetTime) + '] -> ' + data.da.onLines[i] + ' -> line on.');
-											$(this).attr('sta',1);
-										}
-										
-										
-									}
-								});
-
-
-								$('#' + devID).attr('updatetime',devLut);			//更新Dev數據的時間
-								if(Math.abs(lastRequetTime - devLut) > 600){		//判斷更新的時間是否大於10分鐘.
-
-									if($('#' + devID).attr('devSta')==1){
-										window.console.log('[' + __getDateTime(lastRequetTime) + '] -> ' + devID + ' -> timeout, Device off.');
-										$('#' + devID).css('backgroundColor','#999').attr('devSta',0);
-									}
-
-									offDevCount++;									//計數大於5分鐘無反應的數量
-									devSta = 0;
-
-								} else {
-
-
-									if(devSta == 1){	//變更Dev背景顏色
-										$('#' + devID).css('backgroundColor','#00CC00');
-										
-									} else {
-										$('#' + devID).css('backgroundColor','#c66');
-										
-									}
-
-									if($('#' + devID).attr('devSta') != devSta){	//狀態變更閃爍
-										var tmpstr = devSta == 1 ? ' PASS.' : ' FAIL.';
-										window.console.log('[' + __getDateTime(lastRequetTime) + '] -> ' + devID + ' ' + $('#' + devID).text() + tmpstr);
-										$('#' + devID).attr('devSta',devSta);
-										shake($('#' + devID),'red',3);
-									}
-								}
-
-								if(devSta != 1){	//判斷線的狀態
-									lineSta = 0;
-								}
-
-								j++;
+							} else {													//停線狀態
+                                $(this).attr('state',0);								//更顯線體狀態
+								$(this).children('.lineTitle').css('backgroundColor','#999');
+								$(this).children('td').children('.devInfo').css('backgroundColor','#999');
 							}
-
-							if(offDevCount < data.da.devIDs[i].length){
-								if(lineSta != 1){						//改變線體和機種名稱的背景顏色
-									$('.div_LineName').each(function(){
-										if($(this).attr('line')==data.da.onLines[i]){
-											$(this).css('backgroundColor','#c66');
-										}
-									});
-									$('.div_ModelName').each(function(){
-										if($(this).attr('line')==data.da.onLines[i]){
-											$(this).css('backgroundColor','#c66');
-										}
-									});
-								} else {
-									$('.div_LineName').each(function(){
-										if($(this).attr('line')==data.da.onLines[i]){
-											$(this).css('backgroundColor','#0c0');
-										}
-									});
-									$('.div_ModelName').each(function(){
-										if($(this).attr('line')==data.da.onLines[i]){
-											$(this).css('backgroundColor','#0c0');
-										}
-									});
-								}
-							} else {
-								$('.div_LineName').each(function(){
-									if($(this).attr('line')==data.da.onLines[i]){
-										$(this).css('backgroundColor','#999');
-									}
-								});
-								$('.div_ModelName').each(function(){
-									if($(this).attr('line')==data.da.onLines[i]){
-										$(this).css('backgroundColor','#999');
-									}
-								});
-							}
-
-							i++;
+						} else {		//找不到線體, 整條線刪除
+							//$(this).remove();
 						}
-					}
-					// alert(1);
+                    });
 					getDataFromServer();
 				},
 				error: function(XMLHttpRequest, textStatus, errorThrown) {
-					// alert(2);
+					//todo: 獲取資料出錯處理
 					getDataFromServer();
-					
 				}
-	
 			});
 		} else {
-		// alert(3);
-		setTimeout(getDataFromServer,3000);
-
+			setTimeout(getDataFromServer,3000);
 		}
-		
-		
-
     })();
 });
+function getDevInfo(addr, devsInfo) {
+    for (var i in devsInfo)
+    {
+        if(addr == devsInfo[i].addr)
+        {
+            return devsInfo[i];
+        }
+    }
+    return false;
+}
+function getLineInfo(name, linesInfo) {
+	for (var i in linesInfo)
+	{
+		if(name == linesInfo[i].line)
+		{
+			return linesInfo[i];
+		}
+	}
+    return false;
+}
 
 
 function __getDateTime(UnixTime){			//從UnixTime獲取日期時間字符串
 	var now = new Date(UnixTime*1000);
-	//now = now.setTime(UnixTime*1000);
 	var yy = now.getFullYear();      //年
 	var mm = now.getMonth() + 1;     //月
 	var dd = now.getDate();          //日
@@ -259,7 +202,6 @@ function __getDateTime(UnixTime){			//從UnixTime獲取日期時間字符串
 	clock += ii + ":";
 	if (ss < 10) clock += "0"; 
 	clock += ss;
-	//return clock.substr(2,17);     //获取当前日期
 	return clock;
 }
 

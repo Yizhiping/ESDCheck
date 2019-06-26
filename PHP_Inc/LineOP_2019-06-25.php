@@ -126,4 +126,20 @@ switch ($act)
         break;
     case 'GetSetting':
         break;
+    case 'GetFactory':
+        $sql = "select code,name from factorycode order by code";
+    case 'GetFloor':
+        $sql = empty($sql) ? "select code,name from floorcode order by code" : $sql;
+        if($res = $conn->getAllRow($sql))
+        {
+            $tmpStr = null;
+            foreach ($res as $r)
+            {
+                $tmpStr .= $r[0] . chr(127) . $r[1] . chr(13);
+            }
+            __printResultNoRecord(1,$tmpStr);
+        } else {
+            __printResultNoRecord(0, 'No data found');
+        }
+        break;
 }

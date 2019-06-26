@@ -62,18 +62,12 @@ function chkTwoLines($str,$encoding="utf8")		//檢查字符串是否需要顯示
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style>
-#div_DevMain{
-	/*width: 2000px;*/
-}
+
 .div_DevLine {
 	height: 42px;
-	/*line-height: 40px;*/
 	font-size: 12px;
 	font-weight: bold;
-	/*width: 2000px;*/
-	/*overflow: scroll;*/
 	margin-bottom: 2px;
-
 	border-bottom:  1px #222 solid;
 }
 .div_DevLine div,span{
@@ -134,6 +128,7 @@ function chkTwoLines($str,$encoding="utf8")		//檢查字符串是否需要顯示
 	cursor: pointer;
 }
 </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>无标题文档</title>
 </head>
 

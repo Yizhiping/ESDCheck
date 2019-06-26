@@ -1,0 +1,43 @@
+DataInOut
+    表單元素
+        optype      操作類型
+        Act         子類型
+        user        用戶
+        pwd         密碼
+        Line        線體
+        Factory     工廠
+        Floor       樓層
+        Line_Stat   線狀態
+        Line_Data   線數據
+        Model       機種
+
+已實現方法
+    方法 -> optype
+        Loginout    登錄驗證
+            所需資料
+                user
+                pwd
+
+    方法 -> DevOPByLine
+        必須資料 -> Act
+        Get             獲取某條線的報警器資料
+            資料 Factory, Floor, Line 必須
+
+        MultiUpdate     批量更新某條線的報警器狀態
+            資料  Factory, Floor, Line    基本資料, 必須
+                  Line_Stat 線體狀態 0 -> 停線, 1 -> 開線, 必須
+                  Line_Data 線體資料 格式 地址|狀態, 地址|狀態 ... 非必須
+
+        Update          更新單條報警器資料 -> 未實現
+        Add             增加單條報警器資料 -> 未實現
+
+        MultiAdd        批量增加某條線報警器資料, *先刪除現有資料, 再添加*
+            資料  Factory, Floor, Line    基本資料, 必須
+                  Line_Data 線體資料 格式 地址|名稱, 地址|名稱 ... 必須
+
+        Delete          刪除單條報警器資料 -> 未實現
+        SaveSetting     保存設定 -> 未實現
+        GetSetting      獲取設定 -> 未實現
+
+        GetFactory      獲取工廠清單
+        GetFloor        獲取樓層清單
