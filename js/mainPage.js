@@ -86,6 +86,7 @@ $(function() { (function getDataFromServer() {			//自動運行, 從服務器獲
 				timeout: 6000,
 				success: function(data, textStatus) {
 					var lastUpdateTime = data.updateTime;		//數據最後更新的時間
+					console.log(lastUpdateTime);
 					$('#showTime').text('資料時間: ' + __getDateTime(lastUpdateTime) );	//更新數據更新的時間
 
 					$('.resTR').each(function (e) {		//處理所有線體的資料
@@ -128,7 +129,7 @@ $(function() { (function getDataFromServer() {			//自動運行, 從服務器獲
 											} else {
                                                 $(this).css('backgroundColor','#999');
 											}
-                                            shake($(this),'red',3);
+                                            shake($(this));
                                         }
                                     } else {
                                         $(this).remove();								//找不到時, 說明服務器上沒有這個, 刪除之
@@ -205,16 +206,19 @@ function __getDateTime(UnixTime){			//從UnixTime獲取日期時間字符串
 	return clock;
 }
 
-function shake(ele,cls,times){       //指定元素閃爍效果,需要設置好CSS   
-        var i = 0,t= false ,o =ele.attr("class")+" ",c ="",times=times||2;
+function shake(ele){       //指定元素閃爍效果,需要設置好CSS
+//        var i = 0,t= false ,o =ele.attr("class")+" ",c ="",times=times||2;
+		var t = false;
+		var i = 0;
+        var oldColor = ele.css('border-color');
+        var newColor = "#fff";
          if(t) return;
-         t= setInterval(function(){
+         t = setInterval(function(){
              i++;
-             c = i%2 ? o+cls : o;
-             ele.attr("class",c);
-             if(i==2*times){
+			 ele.css('border-color',newColor);
+             if(i%2 == 0){
                  clearInterval(t);
-                 ele.removeClass(cls);
+                 ele.css('border-color',oldColor);
              }
          },200);
  };
