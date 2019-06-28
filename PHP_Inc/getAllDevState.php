@@ -56,12 +56,32 @@ if($allLines & count($allLines) >= 1)
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
-
+/*        線體和機種*/
+        .lineTitle {
+            font-size: 24px;
+            padding: 0px 5px 0px;
+        }
+        /*整個結果表格*/
+        #resTab {
+            color: white;
+            width: 100%;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        /*鼠標放上去整行的效果*/
+        #resTab tr:hover {
+            background-color: #333;
+        }
+        /*表格的單元格*/
+        #resTab td{
+            border-bottom: 1px solid #555;
+        }
+        /*報警器的小方塊*/
         #resTab td:nth-child(3) div {
             border-left: 1px solid #666;
             border-top: 1px solid #666;
-            border-right: 4px solid #666;
-            border-bottom: 4px solid #666;
+            border-right: 3px solid #666;
+            border-bottom: 3px solid #666;
             height: 40px;
             line-height: 40px;
             width: 70px;
@@ -69,51 +89,44 @@ if($allLines & count($allLines) >= 1)
             float: left;
             border-radius: 10%;
             padding: 2px 2px 2px;
-            margin-right: 5px;
+            margin-right: 0.1rem;
             margin-top: 5px;
             display: inline-block;
             cursor: pointer;
             white-space:normal;
             word-break:break-all;
             overflow:hidden;
+            font-weight: bolder;
         }
+        /*報警器小方塊鼠標放上去的效果*/
         #resTab td:nth-child(3) div:hover {
-            border-left: 4px solid #666;
-            border-top: 4px solid #666;
+            border-left: 3px solid #666;
+            border-top: 3px solid #666;
             border-right: 1px solid #666;
             border-bottom: 1px solid #666;
         }
-
-        #resTab {
-            color: white;
-            width: 100%;
-            font-size: 12px;
-            margin-top: 2px;
-        }
+        /*線體和機種*/
         #resTab td:nth-child(1),#resTab td:nth-child(2) {
             border: 1px solid #666;
             border-radius: 10%;
             text-align: center;
             vertical-align: middle;
-            font-size: 17px;
+            font-size: 15px;
             font-weight: bolder;
             cursor: pointer;
         }
+        /*線體*/
         #resTab td:nth-child(1)
         {
-            width: 50px;
+            padding: 0px 1em 0px;
         }
+        /*機種*/
+        #resTab td:nth-child(2){
+            padding: 0px 0.5em 0px;
+        }
+        /*報警器*/
         #resTab td:nth-child(3){
             padding-left: 5px;
-        }
-        #resTab td:nth-child(3) div{
-            height: 40px;
-            line-height: 40px;
-            padding: 1px 2px 1px;
-            font-weight: bolder;
-        }
-        #resTab td:nth-child(2){
-            padding-bottom: 2px;
         }
 
     </style>

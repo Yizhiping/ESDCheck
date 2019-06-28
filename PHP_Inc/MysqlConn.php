@@ -40,7 +40,8 @@ class MysqlConn
             $this->db = $db;
             $this->conn = new mysqli($this->host,$this->uid,$this->pwd,$this->db);
             if(!$this->conn) die("database connect error" . $this->conn->error);
-            $this->conn->set_charset('utf-8');
+            //$this->conn->set_charset('utf-8');
+            $this->conn->query("SET NAMES 'UTF8'");
         }
     }
 
@@ -51,6 +52,7 @@ class MysqlConn
     public function init()
     {
         $this->conn = new mysqli($this->host,$this->uid,$this->pwd,$this->db);
+        $this->conn->query("SET NAMES 'UTF8'");
 
     }
 

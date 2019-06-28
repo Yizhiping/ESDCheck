@@ -1,4 +1,10 @@
 <?php
+//***************************環境設置**************************
+mb_http_input("GBK");
+mb_http_output("GBK");
+header("Content-Type: text/html; charset=GBK");
+date_default_timezone_set('Asia/Shanghai');
+
 //*********************類,庫引用******************************
 include_once "../PHP_Inc/conf.php";
 include_once('../PHP_Inc/MysqlConn.php');
@@ -17,6 +23,7 @@ $clientAddr = __getIP();
 //*********************數據庫參數********************************
 $conn = new MysqlConn($db_host, $db_uid, $db_pwd, $db_name);
 if(!$conn) die("數據庫連接錯誤");
+$conn->query("SET NAMES 'GBK'");
 
 //********************路由開始***********************************
 switch ($opType)

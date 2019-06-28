@@ -19,11 +19,11 @@ $.cookie('floor','');
 
 	$(window).resize(function(){ 		//自適應高度
 		$('#content').css({height:($(window).height()-40-30-20)});
-		if($(window).width()<=1350){
-			$('#content').css('width','1350');
-			$('#menu').css('width','1350');
-			$('#mainTitle').css('width','1350');
-			$('#footer').css('width','1350');
+		if($(window).width()<=760){
+			$('#content').css('width','760');
+			$('#menu').css('width','760');
+			$('#mainTitle').css('width','760');
+			$('#footer').css('width','760');
 		} else {
 			$('#content').css('width',$(window).width());
 			$('#menu').css('width',$(window).width());
@@ -210,15 +210,24 @@ function shake(ele){       //指定元素閃爍效果,需要設置好CSS
 //        var i = 0,t= false ,o =ele.attr("class")+" ",c ="",times=times||2;
 		var t = false;
 		var i = 0;
-        var oldColor = ele.css('border-color');
-        var newColor = "#fff";
+        var oldBGColor = ele.css('border-color');
+        var oldFontColor  = ele.css('color');
+        var newBGColor = "#fff";
+        var newFontColor = '#000';
          if(t) return;
          t = setInterval(function(){
              i++;
-			 ele.css('border-color',newColor);
+			 ele.css('border-color',newBGColor);
+			 ele.css('color', newFontColor);
              if(i%2 == 0){
-                 clearInterval(t);
-                 ele.css('border-color',oldColor);
+
+                 ele.css('border-color',oldBGColor);
+                 ele.css('color', oldFontColor)
              }
-         },200);
+             if(i==12)
+			 {
+                 clearInterval(t);
+			 }
+
+         },100);
  };

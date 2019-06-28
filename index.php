@@ -18,9 +18,9 @@ function __getList($act){
     global $conn;
 
     if($act=='factory'){
-        $sql = "select name from factoryCode order by name ";
+        $sql = "select name from factoryCode order by code ";
     } else if($act=='floor') {
-        $sql = "select name from floorcode order by name ";
+        $sql = "select name from floorcode order by code ";
     }
     $tmpstr = null;
     foreach($conn->getLine($sql) as $v){
